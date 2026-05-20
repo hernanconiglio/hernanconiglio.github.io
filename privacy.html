@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Política de Privacidad · Asistencia SIU + Form al Toque</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f5f3ee;
+      --ink: #1a1a2e;
+      --accent: #2563eb;
+      --accent2: #16a34a;
+      --muted: #6b7280;
+      --card: #ffffff;
+      --border: #e2e0d8;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Source Sans 3', sans-serif;
+      background-color: var(--bg);
+      color: var(--ink);
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2.5rem;
+      background: rgba(245, 243, 238, 0.95);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .nav-logo img { width: 32px; height: 32px; border-radius: 8px; }
+    nav a.nav-link {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    nav a.nav-link:hover { text-decoration: underline; }
+
+    .page-header {
+      background: var(--ink);
+      color: #fff;
+      padding: 4rem 2rem 3rem;
+      text-align: center;
+    }
+    .page-header .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 100px;
+      padding: 0.3rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #93c5fd;
+      margin-bottom: 1.2rem;
+    }
+    .page-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.8rem;
+    }
+    .page-header p {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      font-weight: 300;
+    }
+
+    .content-wrapper {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 4rem 2rem 6rem;
+    }
+
+    /* Summary cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 3.5rem;
+    }
+    .summary-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.4rem;
+      text-align: center;
+    }
+    .summary-card .s-icon { font-size: 2rem; margin-bottom: 0.6rem; }
+    .summary-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .summary-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+    .summary-card.green { border-color: #bbf7d0; background: #f0fdf4; }
+    .summary-card.green h3 { color: #15803d; }
+
+    /* Sections */
+    .policy-section {
+      margin-bottom: 2.5rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .policy-section-header {
+      padding: 1.2rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .policy-section-header .sec-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #eff6ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .policy-section-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+    .policy-section-body {
+      padding: 1.5rem;
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: #374151;
+    }
+    .policy-section-body p + p { margin-top: 0.8rem; }
+    .policy-section-body ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 0.8rem;
+    }
+    .policy-section-body ul li {
+      padding: 0.4rem 0 0.4rem 1.5rem;
+      position: relative;
+    }
+    .policy-section-body ul li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--accent2);
+      font-weight: 700;
+    }
+    .policy-section-body ul li.no::before {
+      content: '✗';
+      color: #dc2626;
+    }
+    .policy-section-body strong { color: var(--ink); }
+
+    .highlight-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      font-size: 0.9rem;
+      color: #166534;
+      margin-top: 1rem;
+    }
+
+    .contact-block {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+      margin-top: 3rem;
+    }
+    .contact-block h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .contact-block p { font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem; line-height: 1.6; }
+    .contact-block a {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      padding: 0.6rem 1.5rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+    .contact-block a:hover { background: #1d4ed8; }
+
+    .update-note {
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 2rem;
+    }
+
+    footer {
+      background: var(--ink);
+      color: #94a3b8;
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.85rem;
+    }
+    footer a { color: #60a5fa; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    footer .footer-links { display: flex; gap: 1.5rem; justify-content: center; margin-bottom: 0.8rem; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img src="https://lh3.googleusercontent.com/jCXHPahrUJka5xrTqpb4Gj9oArBvVavQiJXeyPp6WqmgxNJ8K0FuKv2kLQgxHuFxcRfnngTueP1MG9XFLn8HM-GPxwo=s128-rj-sc0x00ffffff" alt="Logo" />
+      SIU al Toque
+    </a>
+    <a href="index.html" class="nav-link">← Volver al inicio</a>
+  </nav>
+
+  <div class="page-header">
+    <div class="badge">🔒 Privacidad</div>
+    <h1>Política de Privacidad</h1>
+    <p>Asistencia SIU + Form al Toque · Última actualización: mayo de 2025</p>
+  </div>
+
+```html
+<div class="content-wrapper">
+
+  <!-- Summary cards -->
+  <div class="summary-grid">
+    <div class="summary-card green">
+      <div class="s-icon">🛡️</div>
+      <h3>Sin recolección masiva</h3>
+      <p>No recopilamos ni comercializamos datos personales de usuarios o estudiantes.</p>
+    </div>
+
+    <div class="summary-card green">
+      <div class="s-icon">💻</div>
+      <h3>Procesamiento local</h3>
+      <p>La mayor parte del procesamiento ocurre localmente dentro del navegador del usuario.</p>
+    </div>
+
+    <div class="summary-card green">
+      <div class="s-icon">🔑</div>
+      <h3>Acceso limitado</h3>
+      <p>Los permisos de Google OAuth se utilizan únicamente para las funciones explícitamente autorizadas por el usuario.</p>
+    </div>
+  </div>
+
+  <!-- 1 -->
+  <div class="policy-section">
+    <div class="policy-section-header">
+      <div class="sec-icon">👤</div>
+      <h2>1. Responsable de la aplicación</h2>
+    </div>
+
+    <div class="policy-section-body">
+      <p>
+        La extensión <strong>Asistencia SIU + Form al Toque</strong>
+        fue desarrollada por Hernán Coniglio, Mauricio Pintos y
+        Matías Müller, integrantes de la comunidad académica de la
+        Universidad Nacional de Hurlingham (UNAHUR), Argentina.
+      </p>
+
+      <p>
+        Esta herramienta tiene como objetivo facilitar tareas
+        administrativas y académicas relacionadas con el sistema
+        SIU Guaraní.
+      </p>
+
+      <p>
+        Para consultas relacionadas con privacidad o uso de datos:
+        <strong>hernanconiglio@gmail.com</strong>
+      </p>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="policy-section">
+    <div class="policy-section-header">
+      <div class="sec-icon">📄</div>
+      <h2>2. Información procesada por la extensión</h2>
+    </div>
+
+    <div class="policy-section-body">
+
+      <p>
+        La extensión puede procesar la siguiente información
+        únicamente con fines funcionales:
+      </p>
+
+      <ul>
+        <li>
+          Números de DNI ingresados manualmente por el docente.
+        </li>
+
+        <li>
+          Información visible dentro de páginas del sistema
+          SIU Guaraní abiertas por el usuario.
+        </li>
+
+        <li>
+          Datos mínimos necesarios para generar formularios
+          asociados a la cuenta de Google del usuario,
+          cuando dicha funcionalidad es utilizada.
+        </li>
+      </ul>
+
+      <div class="highlight-box">
+        ⚠️ Toda la información se utiliza exclusivamente para
+        ejecutar las funciones solicitadas por el usuario.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="policy-section">
+    <div class="policy-section-header">
+      <div class="sec-icon">🔑</div>
+      <h2>3. Uso de Google APIs y OAuth</h2>
+    </div>
+
+    <div class="policy-section-body">
+
+      <p>
+        Algunas funcionalidades opcionales requieren autenticación
+        mediante Google OAuth 2.0.
+      </p>
+
+      <p>
+        En caso de que el usuario otorgue autorización,
+        la aplicación puede utilizar:
+      </p>
+
+      <ul>
+        <li>Google Drive API</li>
+        <li>Google Forms API</li>
+      </ul>
+
+      <p>
+        El acceso se utiliza exclusivamente para:
+      </p>
+
+      <ul>
+        <li>
+          Crear formularios asociados a la cuenta del usuario.
+        </li>
+
+        <li>
+          Permitir que el usuario gestione dichos formularios.
+        </li>
+      </ul>
+
+      <p>
+        La aplicación no accede, lee, modifica ni comparte
+        correos electrónicos, documentos personales,
+        contactos u otra información no relacionada con
+        la funcionalidad declarada.
+      </p>
+
+      <div class="highlight-box">
+        El uso y transferencia de información recibida desde
+        Google APIs hacia cualquier otra aplicación cumple con
+        la <strong>Google API Services User Data Policy</strong>,
+        incluyendo los requisitos de <strong>Limited Use</strong>.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="policy-section">
+    <div class="policy-section-header">
+      <div class="sec-icon">🚫</div>
+      <h2>4. Datos que NO recopilamos</h2>
+    </div>
+
+    <div class="policy-section-body">
+
+      <ul>
+        <li class="no">
+          No vendemos información personal.
+        </li>
+
+        <li class="no">
+          No utilizamos datos para publicidad.
+        </li>
+
+        <li class="no">
+          No realizamos perfiles de usuarios.
+        </li>
+
+        <li class="no">
+          No compartimos información con terceros.
+        </li>
+
+        <li class="no">
+          No utilizamos herramientas de tracking,
+          analytics invasivos ni fingerprinting.
+        </li>
+
+        <li class="no">
+          No almacenamos bases de datos de alumnos
+          o docentes en servidores externos.
+        </li>
+
+      </ul>
+
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <div class="policy-section">
+    <div class="policy-section-header">
+      <div class="sec-icon">💾</div>
+      <h2>5. Almacenamiento local</h2>
+    </div>
+
+    <div class="policy-section-body">
+
+      <p>
+        La extensión puede utilizar almacenamiento local del navegador
+        (<code>chrome.storage.local</code>) únicamente para guardar:
+      </p>
+
+      <ul>
+        <li>Preferencias del usuario.</li>
+        <li>Configuraciones de funcionamiento.</li>
+        <li>Datos temporales necesarios para la operación local.</li>
+      </ul>
+
+      <p>
+        Esta información permanece exclusivamente en el dispositivo
+        del usuario y no es transmitida a servidores externos.
+      </p>
+
+    </div>
+  </div>
+
+  <!-- 6 -->
+  <div class="policy-section">
+    <div class="policy-section-header">
+      <div class="sec-icon">🧹</div>
+      <h2>6. Eliminación y revocación de permisos</h2>
+    </div>
+
+    <div class="policy-section-body">
+
+      <p>
+        El usuario puede revocar el acceso OAuth otorgado
+        a la aplicación en cualquier momento desde:
+      </p>
+
+      <p>
+        <a
+          href="https://myaccount.google.com/permissions"
+          target="_blank"
+          style="color:var(--accent);"
+        >
+          https://myaccount.google.com/permissions
+        </a>
+      </p>
+
+      <p>
+        También puede eliminar los datos almacenados localmente
+        desinstalando la extensión o limpiando los datos del navegador.
+      </p>
+
+    </div>
+  </div>
+
+  <!-- 7 -->
+  <div class="policy-section">
+    <div class="policy-section-header">
+      <div class="sec-icon">👶</div>
+      <h2>7. Uso destinado</h2>
+    </div>
+
+    <div class="policy-section-body">
+
+      <p>
+        Esta herramienta está orientada a docentes,
+        instituciones educativas y usuarios mayores de 18 años.
+      </p>
+
+    </div>
+  </div>
+
+  <!-- 8 -->
+  <div class="policy-section">
+    <div class="policy-section-header">
+      <div class="sec-icon">📝</div>
+      <h2>8. Cambios en esta política</h2>
+    </div>
+
+    <div class="policy-section-body">
+
+      <p>
+        Esta política puede actualizarse periódicamente
+        para reflejar cambios técnicos, legales o funcionales.
+      </p>
+
+      <p>
+        Las modificaciones serán publicadas en esta misma página.
+      </p>
+
+    </div>
+  </div>
+
+  <!-- Contact -->
+  <div class="contact-block">
+    <h3>Contacto</h3>
+
+    <p>
+      Para consultas relacionadas con privacidad,
+      OAuth o uso de datos:
+    </p>
+
+    <a href="mailto:hernanconiglio@gmail.com">
+      hernanconiglio@gmail.com
+    </a>
+  </div>
+
+  <p class="update-note">
+    Última actualización: mayo de 2026
+  </p>
+
+</div>
+
+  <footer>
+    <div class="footer-links">
+      <a href="index.html">Inicio</a>
+      <a href="privacy.html">Política de privacidad</a>
+      <a href="https://chromewebstore.google.com/detail/fmfocmknpipdeblmpjcgjciejdkljbmk" target="_blank">Chrome Web Store</a>
+    </div>
+    <a href="terms.html">Términos de servicio</a>
+    <p>© 2026 Asistencia SIU + Form al Toque · Universidad Nacional de Hurlingham</p>
+  </footer>
+
+</body>
+</html>

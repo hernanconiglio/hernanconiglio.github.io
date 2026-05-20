@@ -1,0 +1,848 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Asistencia SIU + Form al Toque</title>
+
+  <meta
+    name="description"
+    content="Extensión para Chrome que automatiza la carga de asistencia en SIU Guaraní y permite generar formularios integrados con Google Forms."
+  />
+
+  <meta
+    name="keywords"
+    content="SIU Guaraní, asistencia, docentes, Chrome Extension, Google Forms, Google Drive, OAuth"
+  />
+
+  <meta name="author" content="Hernán Coniglio, Mauricio Pintos, Matías Müller" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root {
+      --bg: #f5f3ee;
+      --ink: #1a1a2e;
+      --accent: #2563eb;
+      --accent2: #16a34a;
+      --muted: #6b7280;
+      --card: #ffffff;
+      --border: #e2e0d8;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Source Sans 3', sans-serif;
+      background-color: var(--bg);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2.5rem;
+      background: rgba(245, 243, 238, 0.9);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .nav-logo img {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+    }
+
+    nav a.nav-link {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    nav a.nav-link:hover {
+      color: var(--accent);
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 8rem 2rem 4rem;
+      position: relative;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(
+          ellipse 60% 50% at 50% 0%,
+          rgba(37, 99, 235, 0.08) 0%,
+          transparent 70%
+        ),
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 39px,
+          var(--border) 39px,
+          var(--border) 40px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 39px,
+          var(--border) 39px,
+          var(--border) 40px
+        );
+
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 0.3rem 1rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 1.8rem;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-badge span {
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .hero-logo {
+      width: 96px;
+      height: 96px;
+      border-radius: 22px;
+      box-shadow:
+        0 8px 32px rgba(37,99,235,0.15),
+        0 2px 8px rgba(0,0,0,0.08);
+
+      margin-bottom: 2rem;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 900;
+      line-height: 1.1;
+      max-width: 720px;
+      margin-bottom: 1.2rem;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .hero p.subtitle {
+      font-size: 1.15rem;
+      font-weight: 300;
+      color: var(--muted);
+      max-width: 620px;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+
+    .hero-contact {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+      animation: fadeUp 0.6s 0.35s ease both;
+    }
+
+    .hero-contact a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .hero-contact a:hover {
+      text-decoration: underline;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent);
+      color: #fff;
+      padding: 0.8rem 1.8rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition:
+        background 0.2s,
+        transform 0.15s,
+        box-shadow 0.2s;
+
+      box-shadow: 0 4px 14px rgba(37,99,235,0.3);
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37,99,235,0.4);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--card);
+      color: var(--ink);
+      border: 1px solid var(--border);
+      padding: 0.8rem 1.8rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition:
+        border-color 0.2s,
+        transform 0.15s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    section {
+      padding: 5rem 2rem;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.8rem;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+
+    .section-sub {
+      font-size: 1rem;
+      color: var(--muted);
+      font-weight: 300;
+      max-width: 580px;
+      line-height: 1.7;
+    }
+
+    .steps-section,
+    .features-inner,
+    .oauth-section,
+    .authors-section {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .steps-header {
+      margin-bottom: 3.5rem;
+    }
+
+    .steps-grid,
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .step-card,
+    .feature-item,
+    .oauth-box,
+    .author-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    .step-card {
+      padding: 2rem 1.5rem;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .step-card:hover {
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      transform: translateY(-3px);
+    }
+
+    .step-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--border);
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+
+    .step-card h3,
+    .feature-item h4 {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .step-card p,
+    .feature-item p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .features-section {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .features-inner .section-label {
+      color: #60a5fa;
+    }
+
+    .features-inner .section-sub,
+    .feature-item p {
+      color: #94a3b8;
+    }
+
+    .feature-item {
+      padding: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(37,99,235,0.25);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .oauth-section {
+      padding-top: 1rem;
+    }
+
+    .oauth-box {
+      padding: 2rem;
+      background: #eff6ff;
+      border-color: #bfdbfe;
+    }
+
+    .oauth-box h3 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: #1d4ed8;
+    }
+
+    .oauth-box p {
+      line-height: 1.8;
+      color: #1e3a8a;
+      margin-bottom: 1rem;
+    }
+
+    .oauth-box ul {
+      padding-left: 1.2rem;
+      color: #1e3a8a;
+      line-height: 1.8;
+    }
+
+    .privacy-banner {
+      max-width: 960px;
+      margin: 0 auto;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 16px;
+      padding: 2.5rem;
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+
+    .privacy-icon {
+      font-size: 2.5rem;
+      flex-shrink: 0;
+    }
+
+    .privacy-banner h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #15803d;
+      margin-bottom: 0.5rem;
+    }
+
+    .privacy-banner p {
+      font-size: 0.95rem;
+      color: #166534;
+      line-height: 1.7;
+    }
+
+    .privacy-banner a {
+      color: var(--accent2);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .authors-section {
+      text-align: center;
+    }
+
+    .authors-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      justify-content: center;
+      margin-top: 3rem;
+    }
+
+    .author-card {
+      padding: 1.5rem 2rem;
+      min-width: 200px;
+    }
+
+    .author-initial {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: #fff;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 0.8rem;
+    }
+
+    .author-card p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }
+
+    footer {
+      background: var(--ink);
+      color: #94a3b8;
+      text-align: center;
+      padding: 2.5rem 2rem;
+      font-size: 0.85rem;
+    }
+
+    footer a {
+      color: #60a5fa;
+      text-decoration: none;
+    }
+
+    footer .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-contact {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 600px) {
+      nav {
+        padding: 1rem 1.25rem;
+      }
+
+      .privacy-banner {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img
+        src="https://lh3.googleusercontent.com/jCXHPahrUJka5xrTqpb4Gj9oArBvVavQiJXeyPp6WqmgxNJ8K0FuKv2kLQgxHuFxcRfnngTueP1MG9XFLn8HM-GPxwo=s128-rj-sc0x00ffffff"
+        alt="Logo"
+      />
+
+      SIU al Toque
+    </a>
+
+    <a href="privacy.html" class="nav-link">
+      Privacidad
+    </a>
+  </nav>
+
+  <section class="hero">
+
+    <div class="hero-badge">
+      ✦ Extensión para Chrome
+      <span>· Educación universitaria</span>
+    </div>
+
+    <img
+      src="https://lh3.googleusercontent.com/jCXHPahrUJka5xrTqpb4Gj9oArBvVavQiJXeyPp6WqmgxNJ8K0FuKv2kLQgxHuFxcRfnngTueP1MG9XFLn8HM-GPxwo=s128-rj-sc0x00ffffff"
+      alt="Logo Asistencia SIU"
+      class="hero-logo"
+    />
+
+    <h1>
+      Tomá asistencia en el SIU<br />
+      <em>al toque</em>
+    </h1>
+
+    <p class="subtitle">
+      Automatizá la carga de asistencia en SIU Guaraní y generá
+      formularios integrados con Google Forms mediante autorización
+      OAuth segura.
+    </p>
+
+    <div class="hero-contact">
+      Contacto:
+      <a href="mailto:hernanconiglio@gmail.com">
+        hernanconiglio@gmail.com
+      </a>
+    </div>
+
+    <div class="hero-actions">
+
+      <a
+        href="https://chromewebstore.google.com/detail/fmfocmknpipdeblmpjcgjciejdkljbmk"
+        target="_blank"
+        class="btn-primary"
+      >
+        🧩 Instalar extensión gratis
+      </a>
+
+      <a href="privacy.html" class="btn-secondary">
+        🔒 Política de privacidad
+      </a>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="steps-section">
+
+      <div class="steps-header">
+        <p class="section-label">Cómo funciona</p>
+
+        <h2 class="section-title">
+          Cuatro pasos,<br />
+          sin complicaciones
+        </h2>
+
+        <p class="section-sub">
+          La extensión automatiza el marcado de asistencia
+          dentro del sistema SIU Guaraní.
+        </p>
+      </div>
+
+      <div class="steps-grid">
+
+        <div class="step-card">
+          <div class="step-number">01</div>
+          <h3>Abrí la extensión</h3>
+          <p>Usala directamente sobre la página del SIU Guaraní.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">02</div>
+          <h3>Pegá los DNIs</h3>
+          <p>Ingresá la lista de alumnos presentes.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">03</div>
+          <h3>Procesamiento automático</h3>
+          <p>La extensión identifica y marca los alumnos automáticamente.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">04</div>
+          <h3>Formulario opcional</h3>
+          <p>También podés generar formularios asociados a tu cuenta de Google.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="features-section">
+
+    <div class="features-inner">
+
+      <p class="section-label">Funcionalidades</p>
+
+      <h2 class="section-title">
+        Integración académica y automatización
+      </h2>
+
+      <p class="section-sub">
+        Diseñada para simplificar tareas docentes
+        y administrativas universitarias.
+      </p>
+
+      <div class="features-grid">
+
+        <div class="feature-item">
+          <div class="feature-icon">📋</div>
+
+          <div>
+            <h4>Procesamiento de DNIs</h4>
+            <p>Procesamiento rápido de listas completas de alumnos.</p>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon">⚡</div>
+
+          <div>
+            <h4>Automatización</h4>
+            <p>Marcado automático dentro de SIU Guaraní.</p>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon">📝</div>
+
+          <div>
+            <h4>Google Forms</h4>
+            <p>Generación opcional de formularios asociados al usuario autenticado.</p>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon">🔒</div>
+
+          <div>
+            <h4>OAuth seguro</h4>
+            <p>Autenticación mediante Google OAuth 2.0 con permisos limitados.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="oauth-section">
+
+      <div class="oauth-box">
+
+        <h3>Uso de Google APIs</h3>
+
+        <p>
+          Algunas funcionalidades opcionales utilizan
+          Google OAuth 2.0 para crear formularios
+          asociados a la cuenta del usuario.
+        </p>
+
+        <ul>
+          <li>Google Drive API</li>
+          <li>Google Forms API</li>
+        </ul>
+
+        <p>
+          La aplicación utiliza únicamente los permisos mínimos
+          necesarios para ejecutar las funcionalidades solicitadas
+          por el usuario.
+        </p>
+
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="privacy-banner">
+
+      <div class="privacy-icon">🔒</div>
+
+      <div>
+
+        <h2>Privacidad y protección de datos</h2>
+
+        <p>
+          La aplicación no vende información personal ni utiliza
+          los datos para publicidad o seguimiento.
+          El procesamiento ocurre principalmente de manera local
+          en el navegador del usuario.
+          <br /><br />
+
+          <a href="privacy.html">
+            Leer política de privacidad →
+          </a>
+
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+
+    <div class="authors-section">
+
+      <p class="section-label">Equipo</p>
+
+      <h2 class="section-title">
+        Desarrollado por docentes universitarios
+      </h2>
+
+      <p class="section-sub" style="margin:0 auto;">
+        Proyecto desarrollado por integrantes de la
+        Universidad Nacional de Hurlingham.
+      </p>
+
+      <div class="authors-grid">
+
+        <div class="author-card">
+          <div class="author-initial">HC</div>
+          <h4>Hernán Coniglio</h4>
+          <p>Docente · Programador · UNAHUR</p>
+        </div>
+
+        <div class="author-card">
+          <div class="author-initial">MP</div>
+          <h4>Mauricio Pintos</h4>
+          <p>Docente · Programador · UNAHUR</p>
+        </div>
+
+        <div class="author-card">
+          <div class="author-initial">MM</div>
+          <h4>Matías Müller</h4>
+          <p>Docente · Programador · UNAHUR</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer>
+
+    <div class="footer-links">
+
+      <a href="index.html">Inicio</a>
+
+      <a href="privacy.html">
+        Política de privacidad
+      </a>
+
+      <a href="terms.html">
+        Términos de servicio
+      </a>
+
+      <a
+        href="https://chromewebstore.google.com/detail/fmfocmknpipdeblmpjcgjciejdkljbmk"
+        target="_blank"
+      >
+        Chrome Web Store
+      </a>
+
+    </div>
+
+    <div class="footer-contact">
+      Contacto:
+      <a href="mailto:hernanconiglio@gmail.com">
+        hernanconiglio@gmail.com
+      </a>
+    </div>
+
+    <p>
+      © 2026 Asistencia SIU + Form al Toque
+      <br />
+      Hernán Coniglio, Mauricio Pintos y Matías Müller
+      <br />
+      Universidad Nacional de Hurlingham
+    </p>
+
+  </footer>
+
+</body>
+</html>
+```
